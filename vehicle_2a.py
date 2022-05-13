@@ -64,9 +64,10 @@ class MiRoClient:
 
         # Step 2. convert intensity into usable movement speed
         # For vehicle 2a, the LEFT sensor value is proportional to the LEFT motor speed, and vice versa
-        # So just using the front sensors:
-        f_left_intensity = intensity_data[0]
-        f_right_intensity = intensity_data[1]
+        # Scaling the output by -0.5 to fit within the range of miro speeds,
+        # and to better reflect the range of values from the sensors
+        f_left_intensity = intensity_data[0]-0.5
+        f_right_intensity = intensity_data[1]-0.5
 
         # Step 3. execute movement
         self.drive(f_left_intensity, f_right_intensity)
@@ -81,9 +82,9 @@ class MiRoClient:
         topic_base_name = "/" + os.getenv("MIRO_ROBOT_NAME")
         # Create new subscriber to recieve light sensor, with associated callback
         self.sub_light_sens = rospy.Subscriber(
-            topic_base_name + "/sensors/light", 
-            Float32MultiArray, 
-            self.callback_light_sens, 
+            topic_base_name + "/sensors/light",
+            Float32MultiArray,
+            self.callback_light_sens,
             queue_size=1
         )
         # Create a new publisher to send velocity commands to the robot

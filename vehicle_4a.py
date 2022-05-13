@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 This code is based on the code "kick_blue_ball.py" given at:
-https://github.com/AlexandrLucas/COM3528/blob/master/com3528_examples/src/kick_blue_ball.py
+https://github.com/AlexandrLucas/COM3528/blob/master/
+com3528_examples/src/kick_blue_ball.py
 
 """
 # Imports
@@ -13,7 +14,7 @@ import cv2  # Computer Vision library
 
 import rospy  # ROS Python interface
 from std_msgs.msg import Float32MultiArray
-from geometry_msgs.msg import TwistStamped  # ROS cmd_vel (velocity control) message
+from geometry_msgs.msg import TwistStamped  # ROS cmd_vel  message
 
 import miro2 as miro  # Import MiRo Developer Kit library
 
@@ -53,35 +54,41 @@ class MiRoClient:
         self.vel_pub.publish(msg_cmd_vel)
 
 
-    def non_linear_speed(self, intensity, threshold = 0.2): #threshold shouhld be between from 0 to 0.4
-        if intensity<threshold:
+    def non_linear_speed(self, intensity, threshold = 0.5):
+        """
+        Translate the intensity into speed based on the threshold value
+        Parameters:
+        - intensity: The light intensity from one sensor, range 0-1
+        - threshold: The threshold past which to change the behaviour.
+        """
+        if intensity < threshold:
+            # Up to the intensity value, scale linearly upwards
             speed = intensity
         else:
-            speed = 0.4-intensity
+            # After the threshold value, start to scale down instead
+            speed = (2*threshold) - intensity
+        # Scale the speed to the range 0-0.4 since that's the miro's top speed
         return speed
 
     def callback_light_sens(self, intensity):
         """
         Get light sensor readings from Miro
         Convert light sensor ROS message to a usable form
-        Array gives [FRONT LEFT, FRONT RIGHT, REAR LEFT, REAR RIGHT] as sensor order
+        Array gives [FRONT LEFT, FRONT RIGHT, REAR LEFT, REAR RIGHT] as sensor
+        order
         """
         # Step 1. get light sensor intensity -> from callback
         # Convert ROS specific MultiArray format into python usable array
         intensity_data = intensity.data
+        print(intensity_data)
+        f_left_intensity = intensity_data[0]
+        f_right_intensity = intensity_data[1]
 
-        # Step 2. convert intensity into usable movement speed
-        # For vehicle 4a, the LEFT sensor value is proportional to the LEFT motor speed, and vice versa
-        # So just using the front sensors:
-
-        # rescale it as the intensity returns the value from 0 to 1, and the max speed of the miro is 0.4
-        f_left_intensity = intensity_data[0]*(4/10)
-        f_right_intensity = intensity_data[1]*(4/10)
-
-        threshold = 0.2
-
-        speed_left  = self.non_linear_speed(f_left_intensity, threshold)
-        speed_right  = self.non_linear_speed(f_right_intensity, threshold)
+        # Step 2. convert intensity into usable movement speed.
+        # For vehicle 4a, the LEFT  motor speed is proportional to the LEFT
+        # sensor value, and vice versa
+        speed_left  = self.non_linear_speed(f_left_intensity)
+        speed_right  = self.non_linear_speed(f_right_intensity)
 
         # Step 3. execute movement
         self.drive(speed_left, speed_right)
@@ -111,7 +118,8 @@ class MiRoClient:
         Main control loop
         """
 
-        print("MiRo implementation of Braitenberg Vehicle 4a, press CTRL+C to halt...")
+        print("MiRo implementation of Braitenberg Vehicle 4a, press CTRL+C to "
+             +"halt...")
         while not rospy.core.is_shutdown():
             rospy.sleep(self.TICK)
 
