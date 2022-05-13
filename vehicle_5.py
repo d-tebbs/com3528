@@ -191,7 +191,7 @@ class Light_Sensor(Threhold_Device):
     RIGHT = "right"
 
     def __init__(self, threshold_val, parent, positive=True,
-                 side=Light_Sensor.LEFT):
+                 side=self.LEFT):
         """
         Modified constructor for the light sensing variant. Needs to communicate
         with ROS since it reads the light value from the MIRO sensors
@@ -214,7 +214,7 @@ class Light_Sensor(Threhold_Device):
         levels and its defined behaviour
         """
         # Get the correct light sensor
-        if self.side == Light_Sensor.LEFT:
+        if self.side == self.LEFT:
             input = self.parent.light_left
         else:
             input = self.parent.light_right
