@@ -108,8 +108,8 @@ class MiRoClient:
     def find_moderate_light(self):
         """
         With this, each wheel turns only if the corresponding sensor value is
-        NOT between 0.4 and 0.6. The robot will find a spot where the light is
-        moderately bright, then stop.
+        NOT between 0.4 and 0.6. The robot will find a moderately bright light
+        and face towards it
         """
         sensor_1 = Light_Sensor(0.6, self, positive=False, side=1)
         sensor_2 = Light_Sensor(0.4, self, positive=True, side=1)
@@ -134,7 +134,7 @@ class MiRoClient:
         """
         Main control loop
         """
-        print("MiRo implementation of Braitenberg Vehicle 4a, press CTRL+C to "
+        print("MiRo implementation of Braitenberg Vehicle 5, press CTRL+C to "
               +"halt...")
         while not rospy.core.is_shutdown():
             rospy.sleep(self.TICK)
@@ -168,7 +168,7 @@ class Threhold_Device:
         """
         # Calculate the net input
         input = 0
-        for device, positive in inputs:
+        for device, positive in self.inputs:
             if positive:
                 input += device.get_output()
             else:
