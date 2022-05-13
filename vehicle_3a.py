@@ -65,8 +65,10 @@ class MiRoClient:
         # Step 2. convert intensity into usable movement speed
         # For vehicle 3a, the LEFT sensor value is proportional to the LEFT motor speed, and vice versa
         # So just using the front sensors:
-        f_left_intensity = intensity_data[0]
-        f_right_intensity = intensity_data[1]
+        
+        # rescale it as the intensity returns the value from 0 to 1, and the max speed of the miro is 0.4
+        f_left_intensity = intensity_data[0]*(4/10) 
+        f_right_intensity = intensity_data[1]*(4/10) 
         
         speed_left  = 1/f_left_intensity
         speed_right  = 1/f_right_intensity
