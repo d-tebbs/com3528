@@ -116,7 +116,7 @@ class MiRoClient:
         sensor_3 = Light_Sensor(0.6, self, positive=False, side=2)
         sensor_4 = Light_Sensor(0.4, self, positive=True, side=2)
         left_inputs = [(sensor_1, True), (sensor_2, True)]
-        left_inputs = [(sensor_3, True), (sensor_4, True)]
+        right_inputs = [(sensor_3, True), (sensor_4, True)]
         self.left_wheel_driver = Threhold_Device(left_inputs, 1)
         self.right_wheel_driver = Threhold_Device(right_inputs, 1)
 
