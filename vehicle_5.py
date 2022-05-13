@@ -111,10 +111,10 @@ class MiRoClient:
         NOT between 0.4 and 0.6. The robot will find a spot where the light is
         moderately bright, then stop.
         """
-        sensor_1 = Light_Sensor(0.6, self, positive=False, side=Left)
-        sensor_2 = Light_Sensor(0.4, self, positive=True, side=Left)
-        sensor_3 = Light_Sensor(0.6, self, positive=False, side=Right)
-        sensor_4 = Light_Sensor(0.4, self, positive=True, side=Right)
+        sensor_1 = Light_Sensor(0.6, self, positive=False, 1)
+        sensor_2 = Light_Sensor(0.4, self, positive=True, 1)
+        sensor_3 = Light_Sensor(0.6, self, positive=False, 2)
+        sensor_4 = Light_Sensor(0.4, self, positive=True, 2)
         left_inputs = [(sensor_1, True), (sensor_2, True)]
         left_inputs = [(sensor_3, True), (sensor_4, True)]
         self.left_wheel_driver = Threhold_Device(left_inputs, 1)
@@ -186,12 +186,9 @@ class Light_Sensor(Threhold_Device):
     The light sensing variant of the the threshol device. Should be used to
     create input paths.
     """
-    # Values to define which camera to use
-    LEFT = "left"
-    RIGHT = "right"
 
     def __init__(self, threshold_val, parent, positive=True,
-                 side=self.LEFT):
+                 side=1):
         """
         Modified constructor for the light sensing variant. Needs to communicate
         with ROS since it reads the light value from the MIRO sensors
@@ -203,6 +200,7 @@ class Light_Sensor(Threhold_Device):
             the light sensor values
         - positive: If True, the device activates above the threshold value; if
             False, it instead deactivates when below it
+        - side: Which side camera to use. 1 for left, 2 for right
         """
         super().__init__([], threshold_val, positive)
         self.parent = parent
@@ -214,7 +212,7 @@ class Light_Sensor(Threhold_Device):
         levels and its defined behaviour
         """
         # Get the correct light sensor
-        if self.side == self.LEFT:
+        if self.side == 1:
             input = self.parent.light_left
         else:
             input = self.parent.light_right
