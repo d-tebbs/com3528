@@ -175,7 +175,7 @@ class Threhold_Device:
                 input -= device.get_output()
         # Choose what to return based on own behaviour setting
         if ((input > self.threshold_val and self.positive)
-          or (input <= self.threshold_val and not self.positive):
+          or (input <= self.threshold_val and not self.positive)):
             return 1
         else:
             return 0
@@ -221,7 +221,7 @@ class Light_Sensor(Threhold_Device):
 
         # Choose what to return based on own behaviour setting
         if ((input > self.threshold_val and self.positive)
-          or (input <= self.threshold_val and not self.positive):
+          or (input <= self.threshold_val and not self.positive)):
             return 1
         else:
             return 0
