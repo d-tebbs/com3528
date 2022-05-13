@@ -111,10 +111,10 @@ class MiRoClient:
         NOT between 0.4 and 0.6. The robot will find a spot where the light is
         moderately bright, then stop.
         """
-        sensor_1 = Light_Sensor(0.6, self, positive=False, 1)
-        sensor_2 = Light_Sensor(0.4, self, positive=True, 1)
-        sensor_3 = Light_Sensor(0.6, self, positive=False, 2)
-        sensor_4 = Light_Sensor(0.4, self, positive=True, 2)
+        sensor_1 = Light_Sensor(0.6, self, positive=False, side=1)
+        sensor_2 = Light_Sensor(0.4, self, positive=True, side=1)
+        sensor_3 = Light_Sensor(0.6, self, positive=False, side=2)
+        sensor_4 = Light_Sensor(0.4, self, positive=True, side=2)
         left_inputs = [(sensor_1, True), (sensor_2, True)]
         left_inputs = [(sensor_3, True), (sensor_4, True)]
         self.left_wheel_driver = Threhold_Device(left_inputs, 1)
