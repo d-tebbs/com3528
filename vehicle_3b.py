@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 This code is based on the code "kick_blue_ball.py" given at:
-https://github.com/AlexandrLucas/COM3528/blob/master/com3528_examples/src/kick_blue_ball.py
+https://github.com/AlexandrLucas/COM3528/blob/master/com3528_examples/src/
+kick_blue_ball.py
 
 """
 # Imports
@@ -13,7 +14,7 @@ import cv2  # Computer Vision library
 
 import rospy  # ROS Python interface
 from std_msgs.msg import Float32MultiArray
-from geometry_msgs.msg import TwistStamped  # ROS cmd_vel (velocity control) message
+from geometry_msgs.msg import TwistStamped  # ROS cmd_vel (velocity control)
 
 import miro2 as miro  # Import MiRo Developer Kit library
 
@@ -56,21 +57,24 @@ class MiRoClient:
         """
         Get light sensor readings from Miro
         Convert light sensor ROS message to a usable form
-        Array gives [FRONT LEFT, FRONT RIGHT, REAR LEFT, REAR RIGHT] as sensor order
+        Array gives [FRONT LEFT, FRONT RIGHT, REAR LEFT, REAR RIGHT] as sensor
+        order
         """
         # Step 1. get light sensor intensity -> from callback
         # Convert ROS specific MultiArray format into python usable array
         intensity_data = intensity.data
 
         # Step 2. convert intensity into usable movement speed
-        # For vehicle 3b, the LEFT sensor value is proportional to the RIGHT motor speed, and vice versa
+        # For vehicle 3b, the LEFT sensor value is proportional to the RIGHT
+        # motor speed, and vice versa
         # So just using the front sensors:
-
-        # rescale it as the intensity returns the value from 0 to 1, and the max speed of the miro is 0.4
         f_left_intensity = intensity_data[0]
         f_right_intensity = intensity_data[1]
-        speed_left  = (1/(1+f_left_intensity))*(4/10)
-        speed_right  = (1/(1+f_right_intensity))*(4/10)
+        # rescale it as the intensity returns the value from 0 to 1, and the max
+        # speed of the miro is 0.4.
+        # Using 0.75 to better reflect the real ranges of values
+        speed_right  = 0.75 - f_left_intensity
+        speed_left  = 0.75 - f_right_intensity
 
         # Step 3. execute movement
         self.drive(speed_left, speed_right)
@@ -100,7 +104,8 @@ class MiRoClient:
         Main control loop
         """
 
-        print("MiRo implementation of Braitenberg Vehicle 3b, press CTRL+C to halt...")
+        print("MiRo implementation of Braitenberg Vehicle 3b, press CTRL+C to "
+            + "halt...")
         while not rospy.core.is_shutdown():
             rospy.sleep(self.TICK)
 

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 This code is based on the code "kick_blue_ball.py" given at:
-https://github.com/AlexandrLucas/COM3528/blob/master/com3528_examples/src/kick_blue_ball.py
+https://github.com/AlexandrLucas/COM3528/blob/master/com3528_examples/src/
+kick_blue_ball.py
 
 """
 # Imports
@@ -13,7 +14,7 @@ import cv2  # Computer Vision library
 
 import rospy  # ROS Python interface
 from std_msgs.msg import Float32MultiArray
-from geometry_msgs.msg import TwistStamped  # ROS cmd_vel (velocity control) message
+from geometry_msgs.msg import TwistStamped  # ROS cmd_vel (velocity control)
 
 import miro2 as miro  # Import MiRo Developer Kit library
 
@@ -51,17 +52,19 @@ class MiRoClient:
 
         # Publish message to control/cmd_vel topic
         self.vel_pub.publish(msg_cmd_vel)
-        
-        
-    def non_linear_speed(self, intensity, threshold = 0.2): #threshold shouhld be between from 0 to 0.4 
-        if intensity<threshold:
-            speed = 0.1
-        elif (intensity>=threshold) or (intensity<(threshold+0.05)):
-            speed = (1/intensity) 
+
+
+    def non_linear_speed(self, intensity, threshold = 0.4):
+        if intensity < threshold:
+            speed = 1.75**(-(threshold/intensity))
+        elif (intensity >= threshold and intensity < 1.5*threshold):
+            speed = 0.4
+        elif intensity >= 1.75*threshold:
+            speed = 0.0
         else:
-            speed = -intensity
-        return speed    
-    
+            speed = 0.2
+        return speed
+
     def callback_light_sens(self, intensity):
         """
         Get light sensor readings from Miro
@@ -73,18 +76,17 @@ class MiRoClient:
         intensity_data = intensity.data
 
         # Step 2. convert intensity into usable movement speed
-        # For vehicle 4b, the LEFT sensor value is proportional to the LEFT motor speed, and vice versa
+        # For vehicle 4b, the LEFT sensor value is proportional to the LEFT
+        # motor speed, and vice versa
         # So just using the front sensors:
-        
-        # rescale it as the intensity returns the value from 0 to 1, and the max speed of the miro is 0.4
-        f_left_intensity = intensity_data[0]*(4/10) 
-        f_right_intensity = intensity_data[1]*(4/10)
-        
-        threshold = 0.2
-        
+        f_left_intensity = intensity_data[0]
+        f_right_intensity = intensity_data[1]
+
+        threshold = 0.4
+
         speed_left  = self.non_linear_speed(f_left_intensity, threshold)
         speed_right  = self.non_linear_speed(f_right_intensity, threshold)
-        
+
         # Step 3. execute movement
         self.drive(speed_left, speed_right)
 
@@ -98,9 +100,9 @@ class MiRoClient:
         topic_base_name = "/" + os.getenv("MIRO_ROBOT_NAME")
         # Create new subscriber to recieve light sensor, with associated callback
         self.sub_light_sens = rospy.Subscriber(
-            topic_base_name + "/sensors/light", 
-            Float32MultiArray, 
-            self.callback_light_sens, 
+            topic_base_name + "/sensors/light",
+            Float32MultiArray,
+            self.callback_light_sens,
             queue_size=1
         )
         # Create a new publisher to send velocity commands to the robot

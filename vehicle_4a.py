@@ -54,7 +54,7 @@ class MiRoClient:
         self.vel_pub.publish(msg_cmd_vel)
 
 
-    def non_linear_speed(self, intensity, threshold = 0.5):
+    def non_linear_speed(self, intensity, threshold = 0.4):
         """
         Translate the intensity into speed based on the threshold value
         Parameters:
@@ -67,7 +67,7 @@ class MiRoClient:
         else:
             # After the threshold value, start to scale down instead
             speed = (2*threshold) - intensity
-        # Scale the speed to the range 0-0.4 since that's the miro's top speed
+        # No need to scale the speed since it can't go above the threshold
         return speed
 
     def callback_light_sens(self, intensity):

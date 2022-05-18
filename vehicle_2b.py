@@ -64,10 +64,10 @@ class MiRoClient:
 
         # Step 2. convert intensity into usable movement speed
         # For vehicle 2b, the LEFT sensor value is proportional to the RIGHT motor speed, and vice versa
-        # Scaling the output down to fit within the range of miro speeds,
+        # Scaling the output by -0.4 to fit within the range of miro speeds,
         # and to better reflect the range of values from the sensors
-        f_left_intensity = intensity_data[0]-0.5
-        f_right_intensity = intensity_data[1]-0.5
+        f_left_intensity = intensity_data[0]-0.4
+        f_right_intensity = intensity_data[1]-0.4
 
         # Step 3. execute movement
         self.drive(f_right_intensity, f_left_intensity)

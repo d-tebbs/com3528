@@ -96,29 +96,7 @@ class MiRoClient:
         )
 
         # Choose a behaviour for the robot by choosing a deivce tree
-        self.find_moderate_light()
-
-    """
-    DEVICES
-    These methods define threshold device trees and set them as current robot
-    behaviour.
-    Each method must set self.left_wheel_driver and self.right_wheel_driver.
-    A sensor tree must have only light sensors as its leaves.
-    """
-    def find_moderate_light(self):
-        """
-        With this, each wheel turns only if the corresponding sensor value is
-        NOT between 0.4 and 0.6. The robot will find a moderately bright light
-        and face towards it
-        """
-        sensor_1 = Light_Sensor(0.6, self, positive=False, side=1)
-        sensor_2 = Light_Sensor(0.4, self, positive=True, side=1)
-        sensor_3 = Light_Sensor(0.6, self, positive=False, side=2)
-        sensor_4 = Light_Sensor(0.4, self, positive=True, side=2)
-        left_inputs = [(sensor_1, True), (sensor_2, True)]
-        right_inputs = [(sensor_3, True), (sensor_4, True)]
-        self.left_wheel_driver = Threhold_Device(left_inputs, 1)
-        self.right_wheel_driver = Threhold_Device(right_inputs, 1)
+        self.seek_light()
 
     def update_speeds(self):
         """
@@ -139,9 +117,40 @@ class MiRoClient:
         while not rospy.core.is_shutdown():
             rospy.sleep(self.TICK)
             self.update_speeds()
+    """
+    DEVICES
+    These methods define threshold device trees and set them as current robot
+    behaviour.
+    Each method must set self.left_wheel_driver and self.right_wheel_driver.
+    A sensor tree must have only light sensors as its leaves.
+    """
+    def find_moderate_light(self):
+        """
+        With this, each wheel turns only if the corresponding sensor value is
+        NOT between 0.4 and 0.6. The robot will find a moderately bright light
+        and face towards it
+        """
+        sensor_1 = Light_Sensor(0.6, self, positive=False, side=1)
+        sensor_2 = Light_Sensor(0.4, self, positive=True, side=1)
+        sensor_3 = Light_Sensor(0.6, self, positive=False, side=2)
+        sensor_4 = Light_Sensor(0.4, self, positive=True, side=2)
+        left_inputs = [(sensor_1, True), (sensor_2, True)]
+        right_inputs = [(sensor_3, True), (sensor_4, True)]
+        self.left_wheel_driver = Threshold_Device(left_inputs, 1)
+        self.right_wheel_driver = Threshold_Device(right_inputs, 1)
+
+    def seek_light(self):
+        """
+        This device will move in a spiral pattern until it finds a light
+        """
+        self.left_wheel_driver = Threshold_Device([], 0, positive=False)
+        light_1 = Light_Sensor(0.4, self, positive=True, side=1)
+        light_2 = Light_Sensor(0.5, self, positive=True, side=1)
+        lights = [(light_1, True), (light_2, True)]
+        self.right_wheel_driver = Threshold_Device(lights, 1)
 
 #------------------------------------------------------------------------------#
-class Threhold_Device:
+class Threshold_Device:
     """
     Threshold devices that can be combined to create various behaviour patterns
     """
@@ -181,7 +190,7 @@ class Threhold_Device:
             return 0
 
 
-class Light_Sensor(Threhold_Device):
+class Light_Sensor(Threshold_Device):
     """
     The light sensing variant of the the threshol device. Should be used to
     create input paths.

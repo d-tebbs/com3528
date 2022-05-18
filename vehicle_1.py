@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 This code has been adapted from the COM3528 code "kick_blue_ball.py" given at:
-https://github.com/AlexandrLucas/COM3528/blob/master/com3528_examples/src/kick_blue_ball.py
-
+https://github.com/AlexandrLucas/COM3528/blob/master/com3528_examples/src/
+kick_blue_ball.py
 """
 # Imports
 ##########################
@@ -13,7 +13,7 @@ import cv2  # Computer Vision library
 
 import rospy  # ROS Python interface
 from std_msgs.msg import Float32MultiArray
-from geometry_msgs.msg import TwistStamped  # ROS cmd_vel (velocity control) message
+from geometry_msgs.msg import TwistStamped  # ROS cmd_vel (velocity control)
 
 import miro2 as miro  # Import MiRo Developer Kit library
 
@@ -36,6 +36,7 @@ class MiRoClient:
         Wrapper to simplify driving MiRo by converting wheel speeds to cmd_vel
         Unmodified from kick_blue_ball.py
         """
+        print(speed_l, speed_r)
         # Prepare an empty velocity command message
         msg_cmd_vel = TwistStamped()
 
@@ -56,21 +57,23 @@ class MiRoClient:
         """
         Get light sensor readings from Miro
         Convert light sensor ROS message to a usable form
-        Array gives [FRONT LEFT, FRONT RIGHT, REAR LEFT, REAR RIGHT] as sensor order
+        Array gives [FRONT LEFT, FRONT RIGHT, REAR LEFT, REAR RIGHT] as sensor
+        order
         """
         # Step 1. get light sensor intensity -> from callback
         # Convert ROS specific MultiArray format into python usable array
         intensity_data = intensity.data
 
         # Step 2. convert intensity into usable movement speed
-        # For vehicle 1, sensor value proportional to motor speed, in straight line
-        # So just get the average of all 4 sensors
-        ave_intensity = 0
-        for i in range(0, len(intensity_data)):
-            ave_intensity += intensity_data[i]
+        # For vehicle 1, sensor value proportional to motor speed, in straight
+        # line. So just get the average of both front sensors
+        ave_intensity = sum(intensity_data[:2])
         ave_intensity = ave_intensity / len(intensity_data)
 
-        # Step 3. execute movement
+        # Step 3. The miro's top speed is 0.4, so enforce that here
+        # (unecessary here, since average intensity is never that high)
+
+        # Step 4. execute movement
         self.drive(ave_intensity, ave_intensity)
 
     def __init__(self):
@@ -83,9 +86,9 @@ class MiRoClient:
         topic_base_name = "/" + os.getenv("MIRO_ROBOT_NAME")
         # Create new subscriber to recieve light sensor, with associated callback
         self.sub_light_sens = rospy.Subscriber(
-            topic_base_name + "/sensors/light", 
-            Float32MultiArray, 
-            self.callback_light_sens, 
+            topic_base_name + "/sensors/light",
+            Float32MultiArray,
+            self.callback_light_sens,
             queue_size=1
         )
         # Create a new publisher to send velocity commands to the robot
@@ -98,7 +101,8 @@ class MiRoClient:
         Main control loop
         """
 
-        print("MiRo implementation of Braitenberg Vehicle 1, press CTRL+C to halt...")        
+        print("MiRo implementation of Braitenberg Vehicle 1, press CTRL+C to "
+             +"halt...")
         while not rospy.core.is_shutdown():
             rospy.sleep(self.TICK)
 

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 This code is based on the code "kick_blue_ball.py" given at:
-https://github.com/AlexandrLucas/COM3528/blob/master/com3528_examples/src/kick_blue_ball.py
+https://github.com/AlexandrLucas/COM3528/blob/master/com3528_examples/src/
+kick_blue_ball.py
 
 """
 # Imports
@@ -13,7 +14,7 @@ import cv2  # Computer Vision library
 
 import rospy  # ROS Python interface
 from std_msgs.msg import Float32MultiArray
-from geometry_msgs.msg import TwistStamped  # ROS cmd_vel (velocity control) message
+from geometry_msgs.msg import TwistStamped  # ROS cmd_vel (velocity control)
 
 import miro2 as miro  # Import MiRo Developer Kit library
 
@@ -56,18 +57,22 @@ class MiRoClient:
         """
         Get light sensor readings from Miro
         Convert light sensor ROS message to a usable form
-        Array gives [FRONT LEFT, FRONT RIGHT, REAR LEFT, REAR RIGHT] as sensor order
+        Array gives [FRONT LEFT, FRONT RIGHT, REAR LEFT, REAR RIGHT] as sensor
+        order
         """
         # Step 1. get light sensor intensity -> from callback
         # Convert ROS specific MultiArray format into python usable array
         intensity_data = intensity.data
 
         # Step 2. convert intensity into usable movement speed
-        # For vehicle 2a, the LEFT sensor value is proportional to the LEFT motor speed, and vice versa
-        # Scaling the output by -0.5 to fit within the range of miro speeds,
+        # For vehicle 2a, the LEFT sensor value is proportional to the LEFT
+        # motor speed, and vice versa
+        # Scaling the output by -0.4 to fit within the range of miro speeds,
         # and to better reflect the range of values from the sensors
-        f_left_intensity = intensity_data[0]-0.5
-        f_right_intensity = intensity_data[1]-0.5
+        f_left_intensity = intensity_data[0]-0.4
+        f_right_intensity = intensity_data[1]-0.4
+
+        print(f_left_intensity, f_right_intensity)
 
         # Step 3. execute movement
         self.drive(f_left_intensity, f_right_intensity)
@@ -97,7 +102,8 @@ class MiRoClient:
         Main control loop
         """
 
-        print("MiRo implementation of Braitenberg Vehicle 2a, press CTRL+C to halt...")
+        print("MiRo implementation of Braitenberg Vehicle 2a, press CTRL+C to "
+            + "halt...")
         while not rospy.core.is_shutdown():
             rospy.sleep(self.TICK)
 
